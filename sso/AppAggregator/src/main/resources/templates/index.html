@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${title}">Application Portal</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      header {
+        text-align: center;
+        color: white;
+        padding: 40px 20px;
+      }
+
+      h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .subtitle {
+        font-size: 1.1em;
+        opacity: 0.9;
+      }
+
+      .apps-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        padding: 20px;
+      }
+
+      .app-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+
+      .app-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .app-icon {
+        font-size: 3em;
+        margin-bottom: 15px;
+        display: block;
+      }
+
+      .app-name {
+        font-size: 1.4em;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .app-description {
+        color: #666;
+        font-size: 0.95em;
+        line-height: 1.5;
+      }
+
+      footer {
+        text-align: center;
+        color: white;
+        padding: 40px 20px 20px;
+        opacity: 0.8;
+      }
+
+      @media (max-width: 768px) {
+        h1 {
+          font-size: 2em;
+        }
+
+        .apps-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .header-processor-section {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        margin: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .header-processor-section h2 {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 1.5em;
+      }
+
+      .processor-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 6px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        margin-bottom: 20px;
+      }
+
+      .processor-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .processor-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .response-container {
+        background: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 20px;
+        margin-top: 20px;
+        max-height: 400px;
+        overflow-y: auto;
+        font-family: "Courier New", monospace;
+        display: none;
+      }
+
+      .response-container.show {
+        display: block;
+      }
+
+      .response-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .response-content {
+        color: #666;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s linear infinite;
+        margin-right: 8px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error-message {
+        color: #d32f2f;
+        padding: 12px;
+        background: #ffebee;
+        border: 1px solid #ef5350;
+        border-radius: 6px;
+        margin-top: 10px;
+      }
+
+      .success-message {
+        color: #388e3c;
+        padding: 12px;
+        background: #e8f5e9;
+        border: 1px solid #66bb6a;
+        border-radius: 6px;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1 th:text="${title}">Application Portal</h1>
+        <p class="subtitle">Access all your applications from one place</p>
+      </header>
+
+      <div class="apps-grid">
+        <a
+          th:each="app : ${apps}"
+          th:href="${app.url}"
+          class="app-card"
+          target="_blank"
+        >
+          <span class="app-icon" th:text="${app.icon}">📱</span>
+          <div class="app-name" th:text="${app.name}">App Name</div>
+          <div class="app-description" th:text="${app.description}">
+            App Description
+          </div>
+        </a>
+      </div>
+
+      <div class="header-processor-section">
+        <h2>Header Processor</h2>
+        <p style="color: #666; margin-bottom: 15px">
+          Process headers from customer management application
+        </p>
+        <button
+          class="processor-button"
+          id="processHeaderBtn"
+          onclick="processHeaders()"
+        >
+          Process Headers
+        </button>
+        <div class="response-container" id="responseContainer">
+          <div class="response-title">Response:</div>
+          <div class="response-content" id="responseContent"></div>
+        </div>
+      </div>
+
+      <footer>
+        <p>&copy; 2024 Link Aggregator. All rights reserved.</p>
+      </footer>
+    </div>
+
+    <script>
+      async function processHeaders() {
+        const btn = document.getElementById("processHeaderBtn");
+        const responseContainer = document.getElementById("responseContainer");
+        const responseContent = document.getElementById("responseContent");
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>Processing...';
+        responseContainer.classList.remove("show");
+
+        try {
+          // Call the AuthenticatorServlet endpoint to process headers and set secure cookies
+          const response = await fetch(
+            "http://localhost:8080/api/authenticate?User=1231",
+            {
+              method: "GET",
+              credentials: "include",
+              headers: {
+                Accept: "application/json, text/plain, */*",
+                USER: "Paranthaman135",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          // Display the response
+          responseContainer.classList.add("show");
+          responseContent.innerHTML = `
+<div class="success-message">✓ Headers processed and secure cookies set successfully</div>
+<pre>${JSON.stringify(data, null, 2)}</pre>
+        `;
+        } catch (error) {
+          // Handle errors
+          responseContainer.classList.add("show");
+          responseContent.innerHTML = `
+<div class="error-message">✗ Error processing headers: ${error.message}</div>
+        `;
+          console.error("Error:", error);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = "Process Headers";
+        }
+      }
+    </script>
+  </body>
+</html>
